@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Новый реестр</title>
+    <link rel="stylesheet" href="{% static 'css/stylesheet.css'%}" type="text/css">
+    <style>
+        .form-textinput {width:100%;}
+        .form-textinput:invalid {width:100%; border: outset #ff0000b2; border-radius: 5px}
+        .form-textinput:valid {width:100%; border: outset #5dfc4eb2; border-radius: 5px}
+        .form-dateinput {border: outset #ff0000b2; border-radius: 5px}
+        .alert{color:red}
+        a:active,
+        a:hover,
+        a {
+            text-decoration: none;
+            color: black;
+        }
+        .blue-button {
+            background: #1abff2;
+            border: none;
+            border-radius: 2px;
+            padding: 10px 15px;
+            color: white;
+        }
+    </style>
+</head>
+<body class="container custom">
+    <div class="container" style="max-width:99%">
+        <div class="px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+            <h1 class="display-4">Создание реестра несоответствий </h1>
+        </div>
+        <div class="py-5">
+            <div class="row">
+                <div class="col-12">
+                    <form novalidate method="post" id="ReestForm" onsubmit="return false;" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% load verbose_names %}
+                        <p hidden>{{ form.step }}</p>
+                        <p>
+                            {% get_verbose_field_name2 "customer" %}<br />
+                            {{ form.customer }}
+                            {% if form.customer.errors %}
+                                {% for error in form.customer.errors %}
+                                    <li class="alert alert-danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name2 "project_dogovor" %}<br />
+                            {{ form.project_dogovor }}
+                            {% if form.project_dogovor.errors %}
+                                {% for error in form.project_dogovor.errors %}
+                                    <li class="alert alert-danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name2 "project_date_contract" %}<br />
+                            {{ form.project_date_contract }}
+                            {% if form.project_date_contract.errors %}
+                                {% for error in form.project_date_contract.errors %}
+                                    <li class="alert alert-danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name2 "project_name" %}<br />
+                            {{ form.project_name }}
+                            {% if form.project_name.errors %}
+                                {% for error in form.project_name.errors %}
+                                    <li class="alert alert-danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name2 "gip" %}<br />
+                            {{ form.gip }}
+                            {% if form.gip.errors %}
+                                {% for error in form.gip.errors %}
+                                    <li class="alert alert-danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name2 "project_reviewer" %}<br />
+                            {{ form.project_reviewer }}
+                            {% if form.project_reviewer.errors %}
+                                {% for error in form.project_reviewer.errors %}
+                                    <li class="alert alert-danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name2 "out_mail_num" %}<br />
+                            {{ form.out_mail_num }}
+                            {% if form.out_mail_num.errors %}
+                                {% for error in form.out_mail_num.errors %}
+                                    <li class="alert alert-danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name2 "out_mail_date" %}<br />
+                            {{ form.out_mail_date }}
+                            {% if form.out_mail_date.errors %}
+                                {% for error in form.out_mail_date.errors %}
+                                    <li class="alert alert-danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name2 "in_mail_num" %}<br />
+                            {{ form.in_mail_num }}
+                            {% if form.in_mail_num.errors %}
+                                {% for error in form.in_mail_num.errors %}
+                                    <li class="alert alert-danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name2 "in_mail_date" %}<br />
+                            {{ form.in_mail_date }}
+                            {% if form.in_mail_date.errors %}
+                                {% for error in form.in_mail_date.errors %}
+                                    <li class="alert alert-danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name2 "num_reestr" %}<br />
+                            {{ form.num_reestr }}
+                            {% if form.num_reestr.errors %}
+                                {% for error in form.num_reestr.errors %}
+                                    <li class="alert alert-danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                        </p>
+                        <p>
+                            Дополнительные файлы<br/>
+                            {{ form.add_files }}
+                            {% if form.add_files.errors %}
+                                {% for error in form.add_files.errors %}
+                                    <li class="alert alert-danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                        </p>
+                        <p>
+                            Наименование документов<br/>
+                            {{ form.file_name }}
+                            {% if form.file_name.errors %}
+                                {% for error in form.file_name.errors %}
+                                    <li class="alert alert-danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                        </p>
+                        <p>
+                            Комментарий к файлам<br/>
+                            {{ form.file_comment }}
+                            {% if form.file_comment.errors %}
+                                {% for error in form.file_comment.errors %}
+                                    <li class="alert alert-danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                        </p>
+                        <p hidden>
+                            {{ form.start_date }}
+                        </p>
+                        <p hidden>
+                            {{ form.end_date }}
+                        </p>
+                        <script>
+                            const project_date = document.querySelectorAll('select[class="form-dateinput"]');
+                            for(const date of project_date){
+                                if (date.value!="") {
+                                    date.style.borderColor="#5dfc4eb2";
+                                }
+                                date.addEventListener('change', select);
+                                date.setAttribute("required", "");
+                            }
+
+                            function select(e) {
+                                if (this.value=="") {
+                                    this.style.borderColor="#ff0000b2";
+                                } else {
+                                    this.style.borderColor="#5dfc4eb2";
+                                }
+                            }
+                        </script>
+                    </form>
+                    <button class="blue-button" onclick="document.forms['ReestForm'].submit();">Отправить форму</button>
+                    <button  class="blue-button"><a href="{% url 'home'%}" style="color:white">Вернуться в профиль</a></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

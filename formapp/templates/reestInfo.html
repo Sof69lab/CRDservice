@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Информация по реестру</title>
+    <link rel="stylesheet" href="{% static 'css/stylesheet.css'%}" type="text/css">
+    <style>
+        table{
+            font-size: 80%;
+            border: 1px solid #F2F2F2;
+        }
+        a:active,
+        a:hover,
+        a {
+            text-decoration: none;
+            color: black;
+        }
+        th {
+            background: #1abff2;
+            color: white;
+            border: none;
+            border-left: 1px solid #F2F2F2;
+	        border-right: 1px solid #F2F2F2;
+        }
+        td {
+            background: white;
+            border: 1px solid #F2F2F2;
+        }
+        .blue-button {
+            background: #1abff2;
+            border: none;
+            border-radius: 2px;
+            padding: 10px 15px;
+            color: white;
+        }
+        form {
+            background: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="container custom">
+    {% load verbose_names %}
+    {% if user.is_authenticated %}
+    <h2 id="reest_num">{{ reest.project_dogovor }}-{{ reest.num_reestr }}</h2>
+    <form>
+        <h3>{% get_verbose_field_name2 "project_dogovor" %}:</h3>
+        <p>{{ reest.project_dogovor }}</p>
+
+        <h3>{% get_verbose_field_name2 "project_name" %}:</h3>
+        <p>{{ reest.project_name }}</p>
+
+        <h3>{% get_verbose_field_name2 "project_date_contract" %}:</h3>
+        <p>{{ reest.project_date_contract }}</p>
+
+        <h3>{% get_verbose_field_name2 "project_reviewer" %}:</h3>
+        <p>{{ reest.project_reviewer }}</p>
+
+        <h3>{% get_verbose_field_name2 "gip" %}:</h3>
+        <p>{{ reest.gip }}</p>
+
+        <h3>Дата создания реестра:</h3>
+        <p>{{ reest.start_date }}</p>
+
+        <h3>Срок исполнения реестра:</h3>
+        <p>{{ reest.end_date }}</p>
+    </form></br>
+    <button class="blue-button"><a style="color:white" href="{% url 'home'%}">К реестрам</a></button>
+    <button class="blue-button"><a style="color:white" href="{% url 'fileManage' id=reest.id %}">Работа с файлами</a></button>
+    <button class="blue-button"><a style="color:white" href="{% url 'homeGIP' id=reest.id %}">К замечаниям</a></button>
+    {% else %}
+    <p>Вы не авторизованы</p>
+    <button class="blue-button"><a style="color:white" href="{% url 'login'%}?next={{request.path}}">Вход</a></button>
+    {% endif %}
+    <script>
+        let reest_num = document.getElementById("reest_num").innerHTML;
+        let s = "Реестр выявленных несоответствий № ";
+        s = s.concat(reest_num.substring(4,8));
+        s = s.concat(reest_num.substring(reest_num.length-2,reest_num.length));
+        document.getElementById("reest_num").innerHTML = s;
+    </script>
+</body>
+</html>

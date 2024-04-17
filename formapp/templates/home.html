@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Личный кабинет</title>
+    <link rel="stylesheet" href="{% static 'css/stylesheet.css'%}" type="text/css">
+    <style>
+        table{
+            font-size: 80%;
+            border: 1px solid #F2F2F2;
+            width:100%;
+        }
+        a:active,
+        a:hover,
+        a {
+            text-decoration: none;
+            color: black;
+        }
+        .main {
+            background: #1abff2;
+            color: white;
+            border: none;
+            border-left: 1px solid #F2F2F2;
+	        border-right: 1px solid #F2F2F2;
+        }
+        td {
+            background: white;
+            border: 1px solid #F2F2F2;
+        }
+        .blue-button {
+            background: #1abff2;
+            border: none;
+            border-radius: 2px;
+            padding: 10px 15px;
+            color: white;
+        }
+        .reestr:hover, .reestr:focus-within {
+            color: #1abff2;
+            border: 1px solid #F2F2F2;
+        }
+    </style>
+</head>
+<body class="container custom">
+    {% load verbose_names %}
+    <h3>Личный кабинет</h3>
+    <h4>{{ user.last_name }} {{ user.first_name }}</h4>
+    <p hidden="hidden" id="group">{{ group }}</p>
+    {% if user.is_authenticated %}
+
+    <table id="table2" border="1" cellspacing="0">
+        <tr>
+            <th class="main">Реестр №</th>
+            <th class="main">Наименование проекта</th>
+            <th class="main">Рецензент</th>
+            <th class="main">ГИП</th>
+            <th class="main">Дата создания</th>
+            <th class="main">Срок исполнения</th>
+            <th class="main">Статус</th>
+            <th class="main" colspan="4">Количество несоответствий</th>
+            <th class="main">Действия</th>
+        </tr>
+        {% for r in reestrs %}
+        <tr class="reestr">
+            <td class="numbers"> {{ r.project_dogovor }}-{{ r.num_reestr }}</td>
+            <td>{{ r.project_name }}</td>
+            <td>{{ r.project_reviewer }}</td>
+            <td align="center" class="names">{{ r.gip }}</td>
+            <td align="center"> {{ r.start_date }}</td>
+            <td align="center"> {{ r.end_date }} </td>
+            <td> </td>
+            {% for i in info %}
+            {% if i.0 == r.id %}
+            <td align="center" class="remarks" colspan="4"> {{i.1}} </td>
+            {% endif %}
+            {% endfor %}
+            <td align="center">
+                <button hidden class="info" onclick="event.stopPropagation()" style="background: white; border: none;"><a style="color: #1abff2" href="{% url 'reestInfo' id=r.id %}">Подробнее</a></button>
+                <button onclick="event.stopPropagation()" style="background: white; border: none;"><a style="color: #1abff2" href="{% url 'homeGIP' id=r.id %}">К замечаниям</a></button>
+                <form novalidate method="post" id="{{ r.id }}" onsubmit="return false;" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input name="id" hidden value="{{ r.id }}">
+                    <input name="customer" hidden value="{{ r.customer }}">
+                    <input name="project_dogovor" hidden value="{{ r.project_dogovor }}">
+                    <input name="project_date_contract" hidden value="{{ r.project_date_contract }}">
+                    <input name="project_name" hidden value="{{ r.project_name }}">
+                    <input name="gip" hidden value="{{ r.gip }}">
+                    <input name="project_reviewer" hidden value="{{ r.project_reviewer }}">
+                    <input name="out_mail_num" hidden value="{{ r.out_mail_num }}">
+                    <input name="out_mail_date" hidden value="{{ r.out_mail_date }}">
+                    <input name="in_mail_num" hidden value="{{ r.in_mail_num }}">
+                    <input name="in_mail_date" hidden value="{{ r.in_mail_date }}">
+                    <input name="num_reestr" hidden value="{{ r.num_reestr }}">
+                </form>
+                <button onclick="event.stopPropagation(); document.getElementById('{{ r.id }}').submit();" style="background: white; border: none; color: #1abff2;">Выгрузить</button>
+            </td>
+        </tr>
+        {% for i in info %}
+        {% if i.0 == r.id %}
+        <tr hidden>
+            <td colspan="7"> </td>
+            <td align="center" style="background: #d9d9d9;">Всего<br/>{{i.1}}</td>
+            <td align="center" style="background: #4472c4; color: white;">Заказчик<br/>{{i.2}}</td>
+            <td align="center" style="background: #9bc2e6; color: white;">Несущественные<br/>{{i.4}}</td>
+            <td align="center" style="background: #c00000; color: white;">Существенные<br/>{{i.3}}</td>
+            <td class="info" align="center" style="color: #1abff2;"> Подробнее </td>
+        </tr>
+        <tr hidden>
+            <td colspan="6"> </td>
+            <td>ВСЕГО</td>
+            <td align="center" style="background: #ededed;">{{i.1}}</td>
+            <td align="center" style="background: #b4c6e7;">{{i.2}}</td>
+            <td align="center" style="background: #ddebf7;">{{i.4}}</td>
+            <td align="center" style="background: #ffafaf;">{{i.3}}</td>
+            <td> </td>
+        </tr>
+        <tr hidden>
+            <td colspan="6"> </td>
+            <td style="color: #70AD47">УСТРАНЕНО</td>
+            <td align="center" style="background: #ededed;"> </td>
+            <td align="center" style="background: #b4c6e7;"> </td>
+            <td align="center" style="background: #ddebf7;"> </td>
+            <td align="center" style="background: #ffafaf;"> </td>
+            <td> </td>
+        </tr>
+        <tr hidden>
+            <td colspan="6"> </td>
+            <td style="color: #ED7D31">В РАБОТЕ</td>
+            <td align="center" style="background: #ededed;"> </td>
+            <td align="center" style="background: #b4c6e7;"> </td>
+            <td align="center" style="background: #ddebf7;"> </td>
+            <td align="center" style="background: #ffafaf;"> </td>
+            <td> </td>
+        </tr>
+        <tr hidden>
+            <td colspan="6"> </td>
+            <td>% завершения</td>
+            <td align="center" style="background: #ededed;"> </td>
+            <td align="center" style="background: #b4c6e7;"> </td>
+            <td align="center" style="background: #ddebf7;"> </td>
+            <td align="center" style="background: #ffafaf;"> </td>
+            <td> </td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+        {% endfor %}
+    </table>
+    <br/>
+    <button class="blue-button" id="new_reestr" hidden><a style="color:white" class="text" href="{% url 'newReestr' %}">Создать новый реестр</a></button>
+    <button class="blue-button"><a style="color:white" class="text" href="{% url 'logout' %}">Выйти</a></button>
+    {% else %}
+    <p>Вы не авторизованы</p>
+    <button class="blue-button"><a style="color:white" href="{% url 'login'%}?next={{request.path}}">Вход</a></button>
+    {% endif %}
+    <script>
+        if ( window.history.replaceState ) {
+            window.history.replaceState( null, null, window.location.href );
+        }
+
+        let role = document.getElementById("group").innerHTML;
+        if (role == "ГИП" || role == "") {
+            document.getElementById("new_reestr").removeAttribute("hidden");
+            let infos = document.getElementsByClassName("info");
+            for (let i=0; i<infos.length; i++) {
+                infos[i].removeAttribute("hidden");
+            }
+        }
+
+        let names = document.getElementsByClassName("names");
+        for (let i=0; i<names.length; i++) {
+            let shortName = "";
+            let k = 0;
+            for (let j=0; j<names[i].innerHTML.length; j++) {
+                if (names[i].innerHTML[j] == " ") {
+                    k++;
+                    if (k == 1) {
+                        shortName += names[i].innerHTML.slice(0,j) + " " + names[i].innerHTML[j+1] + ".";
+                    }
+                    if (k == 2) {
+                        shortName += names[i].innerHTML[j+1] + ".";
+                        break;
+                    }
+                }
+            }
+            names[i].innerHTML = shortName;
+        }
+
+        let numbers = document.getElementsByClassName("numbers");
+        for (let i=0; i<numbers.length; i++) {
+            let s = numbers[i].innerHTML.substring(5,9).concat(numbers[i].innerHTML.substring(numbers[i].innerHTML.length-2,numbers[i].innerHTML.length));
+            numbers[i].innerHTML = s;
+        }
+
+        function remarksInfo(e) {
+            let sibling = this.nextSibling.nextSibling;
+            if (sibling.hasAttribute('hidden')) {
+                sibling.removeAttribute('hidden');
+            } else {
+                sibling.lastChild.previousSibling.innerHTML = "Подробнее";
+                for (let i=0; i < 5; i++) {
+                    sibling.setAttribute('hidden', 'hidden');
+                    sibling = sibling.nextSibling.nextSibling;
+                }
+            }
+        }
+
+        let reestrs = document.getElementsByClassName("reestr");
+        for (let i=0; i<reestrs.length; i++) {
+            reestrs[i].addEventListener("click", remarksInfo);
+        }
+
+        function addInfo(e) {
+            let sibling = this.parentNode.nextSibling.nextSibling;
+            if (sibling.hasAttribute('hidden')) {
+                for (let i=0; i < 4; i++) {
+                    sibling.removeAttribute('hidden');
+                    sibling = sibling.nextSibling.nextSibling;
+                }
+                this.innerHTML = "Скрыть";
+            } else {
+                for (let i=0; i < 4; i++) {
+                    sibling.setAttribute('hidden', 'hidden');
+                    sibling = sibling.nextSibling.nextSibling;
+                }
+                this.innerHTML = "Подробнее";
+            }
+        }
+
+        let infos = document.getElementsByClassName("info");
+        for (let i=0; i<infos.length; i++) {
+            infos[i].addEventListener("click", addInfo);
+        }
+    </script>
+</body>
+</html>

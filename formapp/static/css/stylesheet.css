@@ -1,0 +1,50 @@
+.custom {
+    background:#ddebf7;
+}
+.dark {
+    background:#09375c;
+}
+@font-face {
+    font-family: 'Rosatom';
+    src: url('../fonts/Rosatom-Regular.ttf') format("truetype");
+}
+body {
+    font-family: 'Rosatom';
+}
+a.text:active, /* активная/посещенная ссылка */
+a.text:hover,  /* при наведении */
+a.text {
+  text-decoration: none;
+}
+
+.form-importance {
+    width:100%;
+    border: outset #ff0000b2;
+    border-radius: 5px
+}
+.form-readonly {
+    width:100%;
+    border: outset grey;
+    border-radius: 5px
+}
+.form-textinput {
+    width:100%;
+}
+.form-textinput:invalid {
+    width:100%;
+    border: outset #ff0000b2;
+    border-radius: 5px
+}
+.form-textinput:valid {
+    width:100%;
+    border: outset #5dfc4eb2;
+    border-radius: 5px
+}
+.form-dateinput {
+    border: outset #ff0000b2;
+    border-radius: 5px
+}
+.alert{
+    color:red
+}
+

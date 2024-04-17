@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Выход</title>
+    <link rel="stylesheet" href="{% static 'css/stylesheet.css'%}" type="text/css">
+</head>
+<body class="container custom">
+{% block content %}
+  <p>Вы вышли из аккаунта!</p>
+
+  <a class="text" href="{% url 'login'%}">Нажмите сюда, чтобы авторизироваться снова.</a>
+{% endblock %}
+</body>
+</html>

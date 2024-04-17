@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Личный кабинет</title>
+    <link rel="stylesheet" href="{% static 'css/stylesheet.css'%}" type="text/css">
+    <style>
+        table{
+            font-size: 80%;
+            border: 1px solid #F2F2F2;
+        }
+        a:active,
+        a:hover,
+        a {
+            text-decoration: none;
+            color: black;
+        }
+        th {
+            background: #1abff2;
+            color: white;
+            border: none;
+            border-left: 1px solid #F2F2F2;
+	        border-right: 1px solid #F2F2F2;
+        }
+        td {
+            background: white;
+            border: 1px solid #F2F2F2;
+        }
+        .blue-button {
+            background: #1abff2;
+            border: none;
+            border-radius: 2px;
+            padding: 10px 15px;
+            color: white;
+        }
+        .blue-button:disabled {
+            background: white;
+            color: #1abff2;
+        }
+        .reestr:hover, .reestr:focus-within {
+            color: #1abff2;
+            border: 1px solid #F2F2F2;
+        }
+    </style>
+</head>
+<body class="container custom">
+    {% load verbose_names %}
+    {% if user.is_authenticated %}
+    <h3>Личный кабинет</h3>
+    <h4>{{ user.last_name }} {{ user.first_name }}</h4>
+    <p hidden="hidden" id="group">{{ group }}</p>
+    <h4 id="reest_num">{{ reest.project_dogovor }}-{{ reest.num_reestr }}</h4>
+    <table id="table1" border="1" cellspacing="0">
+        <tr>
+            <th>№ Замечания</th>
+            <th>Обозначение раздела в проекте</th>
+            <th>Наименование замечания</th>
+            <th>Ответственный за устранение замечания</th>
+            <th>Получено</th>
+            <th>Срок исполнения</th>
+            <th>Статус</th>
+            <th>Трудозатраты, дн. (на устранение замечания) (план)</th>
+            <th>Трудозатраты, дн. (на устранение замечания) (факт)</th>
+            <th>Значимость замечания</th>
+        </tr>
+        {% for r in reestrs %}
+        <tr class="reestr" id="{{ r.id }}"><!--onclick="window.location.href='{% url 'boss' id=r.id %}'; return false;" -->
+            <td>{{ r.num_remark }}</td>
+            <td>{{ r.designation_name }}</td>
+            <td>{{ r.remark_name }}</td>
+            <td align="center" class="names">{{ r.responsibleTrouble_name }}</td>
+            <td align="center" >{{ reest.start_date }}</td>
+            <td align="center" >{{ deadline }}</td>
+            <td></td>
+            {% if r.labor_costs_plan %}
+                <td align="center" >{{ r.labor_costs_plan }}</td>
+            {% else %}
+                <td> </td>
+            {% endif %}
+            {% if r.labor_costs_fact %}
+                <td align="center" >{{ r.labor_costs_fact }}</td>
+            {% else %}
+                <td> </td>
+            {% endif %}
+            <td class="importance">{{ r.total_importance }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br/>
+    <button class="blue-button" id="new_reestr"><a style="color:white" class="text" href="{% url 'GIP' id=reest.id %}">Создать новое замечание</a></button>
+    <form hidden novalidate method="post" id="r" onsubmit="return false;" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input name="id" hidden value="{{ reest.id }}">
+        <input name="customer" hidden value="{{ reest.customer }}">
+        <input name="project_dogovor" hidden value="{{ reest.project_dogovor }}">
+        <input name="project_date_contract" hidden value="{{ reest.project_date_contract }}">
+        <input name="project_name" hidden value="{{ reest.project_name }}">
+        <input name="gip" hidden value="{{ reest.gip }}">
+        <input name="project_reviewer" hidden value="{{ reest.project_reviewer }}">
+        <input name="out_mail_num" hidden value="{{ reest.out_mail_num }}">
+        <input name="out_mail_date" hidden value="{{ reest.out_mail_date }}">
+        <input name="in_mail_num" hidden value="{{ reest.in_mail_num }}">
+        <input name="in_mail_date" hidden value="{{ reest.in_mail_date }}">
+        <input name="num_reestr" hidden value="{{ reest.num_reestr }}">
+    </form>
+    <button onclick="event.stopPropagation(); document.getElementById('r').submit();" class="blue-button">Выгрузить реестр</button>
+    <button hidden id="files" class="blue-button"><a style="color:white" href="{% url 'fileManage' id=reest.id %}">Работа с файлами</a></button>
+    <button class="blue-button"><a style="color:white" class="text" href="{% url 'home' %}">Вернуться к реестрам</a></button>
+    <button class="blue-button"><a style="color:white" class="text" href="{% url 'logout' %}">Выйти</a></button> <br/> <br/>
+    <button class="blue-button" id="uploadDoc"><a style="color:white" class="text" href="{% url 'uploadFile' id=reest.id %}">Загрузить подписанный реестр</a></button>
+    <form hidden novalidate method="post" id="change" onsubmit="return false;" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input name="step" id="step" hidden value="{{ reest.step }}">
+    </form>
+    <button id="changeStep" onclick="changeStep()" class="blue-button">Направить реестр на согласование</button>
+    {% else %}
+    <p>Вы не авторизованы</p>
+    <button class="blue-button"><a style="color:white" href="{% url 'login'%}?next={{request.path}}">Вход</a></button>
+    {% endif %}
+    <script>
+        if ( window.history.replaceState ) {
+            window.history.replaceState( null, null, window.location.href );
+        }
+        let stepNum = document.getElementById('step');
+
+        let role = document.getElementById("group").innerHTML;
+        if (role == "Руководитель" || role == "Исполнитель") {
+            document.getElementById("new_reestr").setAttribute("hidden","");
+            document.getElementById("files").removeAttribute("hidden");
+        }
+
+        function changeStep(e) {
+            if (role == "Руководитель") {
+                stepNum.value=2;
+            } else if (role == "ГИП") {
+                stepNum.value=3;
+            }
+            document.getElementById('change').submit();
+        }
+
+        function nextStep(e) {
+            let s = "http://127.0.0.1:8000/"
+            if (role == "Руководитель") {
+                if (this.children[9].innerHTML == "") {
+                    s = s.concat("boss/");
+                    s = s.concat(this.id);
+                    s = s.concat("/");
+                } else if (stepNum.value < 3) {
+                    s = s.concat("boss2/");
+                    s = s.concat(this.id);
+                    s = s.concat("/");
+                } else if (stepNum.value == 3) {
+                    s = s.concat("final/");
+                    s = s.concat(this.id);
+                    s = s.concat("/");
+                }
+            } else if (role == "Исполнитель") {
+                s = s.concat("employee/");
+                s = s.concat(this.id);
+                s = s.concat("/");
+            } else if (role == "ГИП") {
+                if (this.children[8].innerHTML == " ") {
+                    s = s.concat("gip2/");
+                    s = s.concat(this.id);
+                    s = s.concat("/");
+                } else {
+                    s = s.concat("close/");
+                    s = s.concat(this.id);
+                    s = s.concat("/");
+                }
+            }
+            window.location.href = s;
+            return false;
+        }
+
+        let reestrs = document.getElementsByClassName("reestr");
+        for (let i=0; i<reestrs.length; i++) {
+            reestrs[i].addEventListener("click", nextStep);
+        }
+
+        let names = document.getElementsByClassName("names");
+        for (let i=0; i<names.length; i++) {
+            let shortName = "";
+            let k = 0;
+            for (let j=0; j<names[i].innerHTML.length; j++) {
+                if (names[i].innerHTML[j] == " ") {
+                    k++;
+                    if (k == 1) {
+                        shortName += names[i].innerHTML.slice(0,j) + " " + names[i].innerHTML[j+1] + ".";
+                    }
+                    if (k == 2) {
+                        shortName += names[i].innerHTML[j+1] + ".";
+                        break;
+                    }
+                }
+            }
+            names[i].innerHTML = shortName;
+        }
+
+        let button = document.getElementById("changeStep");
+        if (stepNum.value == 1 && role == "Руководитель") {
+            let imps = document.getElementsByClassName("importance");
+            for (let i=0; i < imps.length; i++) {
+                if (imps[i].innerHTML == '') {
+                    document.getElementById("uploadDoc").setAttribute("hidden","");
+                    document.getElementById("changeStep").setAttribute("hidden","");
+                    break;
+                }
+            }
+        } else if (stepNum.value == 2 && role == "Руководитель") {
+            button.innerHTML = "Реестр направлен на согласование";
+            button.setAttribute("disabled","");
+        } else if (stepNum.value == 2 && role == "ГИП") {
+            button.innerHTML = "Согласовать реестр";
+        } else if (stepNum.value == 3 && role == "ГИП") {
+            button.innerHTML = "Реестр согласован";
+            button.setAttribute("disabled","");
+        } else {
+            document.getElementById("uploadDoc").setAttribute("hidden","");
+            document.getElementById("changeStep").setAttribute("hidden","");
+        }
+
+        let reest_num = document.getElementById("reest_num").innerHTML;
+        let s = "Реестр выявленных несоответствий № ";
+        s = s.concat(reest_num.substring(4,8));
+        s = s.concat(reest_num.substring(reest_num.length-2,reest_num.length));
+        document.getElementById("reest_num").innerHTML = s;
+
+    </script>
+</body>
+</html>

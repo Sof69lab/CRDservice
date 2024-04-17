@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Авторизация</title>
+    <link rel="stylesheet" href="{% static 'css/stylesheet.css'%}" type="text/css">
+    <style>
+        body {
+            position: relative;
+            height: 100vh;
+        }
+        form {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -70%);
+        }
+        td {
+            color: white;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body style="background:#09375c">
+    <h1 style="text-align:center; color:white">СЕРВИС ПО ФОРМИРОВАНИЮ РЕЕСТРОВ НЕСООТВЕТСТВИЙ</h1>
+    {% block content %}
+    {% if form.errors %}
+        <p style="color:white">Неверное имя пользователя и/или пароль. Пожалуйста, повторите попытку.</p>
+    {% endif %}
+
+   <!-- {% if next %}
+        {% if user.is_authenticated %}
+            <p>Ваш аккаунт не имеет доступа к данной странице. Для продолжения,
+                авторизируйтесь через аккаунт с соответствующим доступом.</p>
+        {% else %}
+             <p>Пожалуйста, авторизируйтесь, чтобы увидеть эту страницу.</p>
+        {% endif %}
+    {% endif %}-->
+
+    <form method="post" action="{% url 'login' %}">
+    {% csrf_token %}
+
+    <h1 style="text-align:center; color:white">Авторизация</h1>
+    <table align="center">
+
+    <tr>
+        <td>{{ form.username.label_tag }}</td>
+        <td>{{ form.username }}</td>
+    </tr>
+
+    <tr>
+        <td>{{ form.password.label_tag }}</td>
+        <td>{{ form.password }}</td>
+    </tr>
+
+    <tr>
+        <td align="center" colspan="2"><input style="background:#1abff2; border: none; color:white; border-radius: 2px; padding: 10px 15px;" type="submit" value="Войти" /></td>
+    </tr>
+    </table>
+
+    <input type="hidden" name="next" value="{{ next }}" />
+    </form>
+    {% endblock %}
+</body>
+</html>

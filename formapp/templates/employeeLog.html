@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Исполнитель</title>
+    <link rel="stylesheet" href="{% static 'css/stylesheet.css'%}" type="text/css">
+    <style>
+        a:active,
+        a:hover,
+        a {
+            text-decoration: none;
+            color: black;
+        }
+        .blue-button {
+            background: #1abff2;
+            border: none;
+            border-radius: 2px;
+            padding: 10px 15px;
+            color: white;
+        }
+    </style>
+</head>
+<body style="text-align:center;" class="container custom">
+    <p>Пожалуйста, авторизируйтесь в качестве исполнителя, чтобы увидеть эту страницу.</p>
+    <button class="blue-button"><a style="color:white" href="{% url 'login'%}?next={{request.path}}">Вход</a></button>
+</body>
+</html>
