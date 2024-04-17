@@ -302,7 +302,7 @@ def home(request):
             insignific = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Несущественное') & Q(executor_name=request.user))))
             info.append([r.id, remarks, customer, signific, insignific])
     else:
-        return render(request, 'home.html')
+        return redirect("accounts/login/?next=/")
     if request.method == 'POST':
         xlslxCreate(request)
         return render(request, 'home.html', {'reestrs': reestrs, 'group': group, 'info': info})

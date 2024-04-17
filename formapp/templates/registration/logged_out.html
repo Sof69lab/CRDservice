@@ -5,12 +5,26 @@
     <meta charset="UTF-8">
     <title>Выход</title>
     <link rel="stylesheet" href="{% static 'css/stylesheet.css'%}" type="text/css">
+    <style>
+        .blue-button {
+            background: #1abff2;
+            border: none;
+            border-radius: 2px;
+            padding: 10px 15px;
+            color: white;
+        }
+        a:active,
+        a:hover,
+        a {
+            text-decoration: none;
+            color: black;
+        }
+    </style>
 </head>
 <body class="container custom">
 {% block content %}
   <p>Вы вышли из аккаунта!</p>
-
-  <a class="text" href="{% url 'login'%}">Нажмите сюда, чтобы авторизироваться снова.</a>
+  <button class="blue-button"><a class="text" style="color:white" href="{% url 'login'%}">Войти снова</a></button>
 {% endblock %}
 </body>
 </html>
