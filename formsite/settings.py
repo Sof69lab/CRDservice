@@ -82,8 +82,8 @@ DATABASES = {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
         "NAME": "form_db",
         "USER": "postgres",
-        "PASSWORD": "63618ljv",
-        "HOST": "127.0.0.1",
+        "PASSWORD": "!QAZ2wsx#EDC",
+        "HOST": "10.200.19.240",
         "PORT": "5432",
     }
 }
