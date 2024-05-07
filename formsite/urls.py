@@ -20,8 +20,11 @@ from django.conf.urls.static import static
 from formsite.settings import MEDIA_URL, MEDIA_ROOT
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
+    path("admin/", admin.site.urls, name='admin'),
     path("", include("formapp.urls")),
     path('accounts/', include('django.contrib.auth.urls')),
 ]
 urlpatterns += staticfiles_urlpatterns() + static(MEDIA_URL, document_root=MEDIA_ROOT)
+
+admin.site.site_title = "Администрирование"
+admin.site.site_header = "Администрирование"

@@ -66,7 +66,11 @@
             <td align="center" class="names">{{ r.gip }}</td>
             <td align="center"> {{ r.start_date }}</td>
             <td align="center"> {{ r.end_date }} </td>
-            <td> </td>
+            {% if r.step == 4 %}
+            <td>Завершён</td>
+            {% else %}
+            <td>В работе</td>
+            {% endif %}
             {% for i in info %}
             {% if i.0 == r.id %}
             <td align="center" class="remarks" colspan="4"> {{i.1}} </td>
@@ -115,28 +119,28 @@
         <tr hidden>
             <td colspan="6"> </td>
             <td style="color: #70AD47">УСТРАНЕНО</td>
-            <td align="center" style="background: #ededed;"> </td>
-            <td align="center" style="background: #b4c6e7;"> </td>
-            <td align="center" style="background: #ddebf7;"> </td>
-            <td align="center" style="background: #ffafaf;"> </td>
+            <td align="center" style="background: #ededed;">{{i.6}}</td>
+            <td align="center" style="background: #b4c6e7;">{{i.9}}</td>
+            <td align="center" style="background: #ddebf7;">{{i.15}}</td>
+            <td align="center" style="background: #ffafaf;">{{i.12}}</td>
             <td> </td>
         </tr>
         <tr hidden>
             <td colspan="6"> </td>
             <td style="color: #ED7D31">В РАБОТЕ</td>
-            <td align="center" style="background: #ededed;"> </td>
-            <td align="center" style="background: #b4c6e7;"> </td>
-            <td align="center" style="background: #ddebf7;"> </td>
-            <td align="center" style="background: #ffafaf;"> </td>
+            <td align="center" style="background: #ededed;">{{i.5}}</td>
+            <td align="center" style="background: #b4c6e7;">{{i.8}}</td>
+            <td align="center" style="background: #ddebf7;">{{i.14}}</td>
+            <td align="center" style="background: #ffafaf;">{{i.11}}</td>
             <td> </td>
         </tr>
         <tr hidden>
             <td colspan="6"> </td>
             <td>% завершения</td>
-            <td align="center" style="background: #ededed;"> </td>
-            <td align="center" style="background: #b4c6e7;"> </td>
-            <td align="center" style="background: #ddebf7;"> </td>
-            <td align="center" style="background: #ffafaf;"> </td>
+            <td align="center" style="background: #ededed;">{{i.7}}</td>
+            <td align="center" style="background: #b4c6e7;">{{i.10}}</td>
+            <td align="center" style="background: #ddebf7;">{{i.16}}</td>
+            <td align="center" style="background: #ffafaf;">{{i.13}}</td>
             <td> </td>
         </tr>
         {% endif %}
@@ -145,6 +149,7 @@
     </table>
     <br/>
     <button class="blue-button" id="new_reestr" hidden><a style="color:white" class="text" href="{% url 'newReestr' %}">Создать новый реестр</a></button>
+    <button class="blue-button" id="adm" hidden><a style="color:white" class="text" href="{% url 'admin:index' %}">Администрирование</a></button>
     <button class="blue-button"><a style="color:white" class="text" href="{% url 'logout' %}">Выйти</a></button>
     <script>
         if ( window.history.replaceState ) {
@@ -158,6 +163,9 @@
             for (let i=0; i<infos.length; i++) {
                 infos[i].removeAttribute("hidden");
             }
+        }
+        if (role == "") {
+            document.getElementById("adm").removeAttribute("hidden");
         }
 
         let names = document.getElementsByClassName("names");

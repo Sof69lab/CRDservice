@@ -38,6 +38,10 @@
                     <form novalidate method="POST" id="GIP2" onsubmit="return false;">
                         {% csrf_token %}
                         {% load verbose_names %}
+                        <p hidden>
+                            {{ form.gip }}
+                            {{ form.reestrID }}
+                        </p>
                         <p>
                             {% get_verbose_field_name "customer" %}<br />
                             {{ form.customer }}

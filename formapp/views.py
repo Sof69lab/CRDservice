@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from formapp.forms import BossForm1, GIPform, GIPform2, FinalForm, CloseForm, emplForm, ReestrForm, workDays, FileForm
+from formapp.forms import BossForm1, GIPform, GIPform2, FinalForm, CloseForm, emplForm, ReestrForm, workDays, FileForm, BossForm2
 from formapp.models import reestr, reestInfo, files
 from django.shortcuts import redirect
 from django.db.models import Q
@@ -262,45 +262,97 @@ def home(request):
         group = 'ГИП'
         reestrs = reestInfo.objects.filter(gip=request.user)
         for r in reestrs:
-            remarks = len(reestr.objects.filter(reestrID=r.id))
-            customer = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='В компетенции Заказчика'))))
-            signific = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Существенное'))))
-            insignific = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Несущественное'))))
-            info.append([r.id, remarks, customer, signific, insignific])
+            work = len(reestr.objects.filter((Q(reestrID=r.id) & Q(cancel_remark=None) & Q(actuality=True))))
+            remarks = len(reestr.objects.filter((Q(reestrID=r.id) & Q(actuality=True))))
+            customer = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='В компетенции Заказчика') & Q(actuality=True))))
+            workC = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='В компетенции Заказчика')
+                                               & Q(cancel_remark=None) & Q(actuality=True))))
+            signific = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Существенное') & Q(actuality=True))))
+            workS = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Существенное')
+                                               & Q(cancel_remark=None) & Q(actuality=True))))
+            insignific = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Несущественное') & Q(actuality=True))))
+            workI = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Несущественное')
+                                               & Q(cancel_remark=None) & Q(actuality=True))))
+            info.append([r.id, remarks, customer, signific, insignific, work, remarks - work,
+                         (remarks - work) * 100.0 / remarks,
+                         workC, customer - workC, (customer - workC) * 100.0 / customer if customer else 0,
+                         workS, signific - workS, (signific - workS) * 100.0 / signific if signific else 0,
+                         workI, insignific - workI, (insignific - workI) * 100.0 / insignific if insignific else 0])
     elif request.user.is_superuser:
         reestrs = reestInfo.objects.all()
         for r in reestrs:
+            work = len(reestr.objects.filter((Q(reestrID=r.id) & Q(cancel_remark=None))))
             remarks = len(reestr.objects.filter(reestrID=r.id))
             customer = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='В компетенции Заказчика'))))
+            workC = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='В компетенции Заказчика')
+                                               & Q(cancel_remark=None))))
             signific = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Существенное'))))
+            workS = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Существенное')
+                                               & Q(cancel_remark=None))))
             insignific = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Несущественное'))))
-            info.append([r.id, remarks, customer, signific, insignific])
+            workI = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Несущественное')
+                                               & Q(cancel_remark=None))))
+            info.append([r.id, remarks, customer, signific, insignific, work, remarks - work,
+                         (remarks - work) * 100.0 / remarks,
+                         workC, customer - workC, (customer - workC) * 100.0 / customer if customer else 0,
+                         workS, signific - workS, (signific - workS) * 100.0 / signific if signific else 0,
+                         workI, insignific - workI, (insignific - workI) * 100.0 / insignific if insignific else 0])
     elif request.user.groups.filter(name='Руководитель').exists():
         group = 'Руководитель'
-        remarkList = reestr.objects.filter(responsibleTrouble_name=request.user)
+        remarkList = reestr.objects.filter((Q(responsibleTrouble_name=request.user) & Q(actuality=True)))
         IDlist = []
         for r in remarkList:
             IDlist.append(r.reestrID.id)
         reestrs = reestInfo.objects.filter(id__in=IDlist)
         for r in reestrs:
-            remarks = len(reestr.objects.filter((Q(reestrID=r.id) & Q(responsibleTrouble_name=request.user))))
-            customer = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='В компетенции Заказчика') & Q(responsibleTrouble_name=request.user))))
-            signific = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Существенное') & Q(responsibleTrouble_name=request.user))))
-            insignific = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Несущественное') & Q(responsibleTrouble_name=request.user))))
-            info.append([r.id, remarks, customer, signific, insignific])
+            work = len(reestr.objects.filter((Q(reestrID=r.id) & Q(responsibleTrouble_name=request.user) &
+                                              Q(cancel_remark=None) & Q(actuality=True))))
+            remarks = len(reestr.objects.filter((Q(reestrID=r.id) & Q(responsibleTrouble_name=request.user) & Q(actuality=True))))
+            customer = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='В компетенции Заказчика')
+                                                  & Q(responsibleTrouble_name=request.user) & Q(actuality=True))))
+            workC = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='В компетенции Заказчика')
+                                               & Q(responsibleTrouble_name=request.user) & Q(cancel_remark=None) & Q(actuality=True))))
+            signific = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Существенное') &
+                                                  Q(responsibleTrouble_name=request.user) & Q(actuality=True))))
+            workS = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Существенное')
+                                               & Q(responsibleTrouble_name=request.user) & Q(cancel_remark=None) & Q(actuality=True))))
+            insignific = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Несущественное')
+                                                    & Q(responsibleTrouble_name=request.user) & Q(actuality=True))))
+            workI = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Несущественное')
+                                               & Q(responsibleTrouble_name=request.user) & Q(cancel_remark=None) & Q(actuality=True))))
+            info.append([r.id, remarks, customer, signific, insignific, work, remarks - work,
+                         (remarks - work) * 100.0 / remarks,
+                         workC, customer - workC, (customer - workC) * 100.0 / customer if customer else 0,
+                         workS, signific - workS, (signific - workS) * 100.0 / signific if signific else 0,
+                         workI, insignific - workI, (insignific - workI) * 100.0 / insignific if insignific else 0])
     elif request.user.groups.filter(name='Исполнитель').exists():
         group = 'Исполнитель'
-        remarkList = reestr.objects.filter(executor_name=request.user)
+        remarkList = reestr.objects.filter((Q(executor_name=request.user) & Q(actuality=True)))
         IDlist = []
         for r in remarkList:
             IDlist.append(r.reestrID.id)
         reestrs = reestInfo.objects.filter(id__in=IDlist)
         for r in reestrs:
-            remarks = len(reestr.objects.filter((Q(reestrID=r.id) & Q(executor_name=request.user))))
-            customer = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='В компетенции Заказчика') & Q(executor_name=request.user))))
-            signific = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Существенное') & Q(executor_name=request.user))))
-            insignific = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Несущественное') & Q(executor_name=request.user))))
-            info.append([r.id, remarks, customer, signific, insignific])
+            work = len(reestr.objects.filter((Q(reestrID=r.id) & Q(executor_name=request.user) & Q(cancel_remark=None)
+                                              & Q(actuality=True))))
+            remarks = len(reestr.objects.filter((Q(reestrID=r.id) & Q(executor_name=request.user) & Q(actuality=True))))
+            customer = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='В компетенции Заказчика')
+                                                  & Q(executor_name=request.user) & Q(actuality=True))))
+            workC = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='В компетенции Заказчика')
+                                               & Q(executor_name=request.user) & Q(cancel_remark=None) & Q(actuality=True))))
+            signific = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Существенное')
+                                                  & Q(executor_name=request.user) & Q(actuality=True))))
+            workS = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Существенное')
+                                               & Q(executor_name=request.user) & Q(cancel_remark=None) & Q(actuality=True))))
+            insignific = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Несущественное')
+                                                    & Q(executor_name=request.user) & Q(actuality=True))))
+            workI = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Несущественное')
+                                               & Q(executor_name=request.user) & Q(cancel_remark=None) & Q(actuality=True))))
+            info.append([r.id, remarks, customer, signific, insignific, work, remarks - work,
+                         (remarks - work) * 100.0 / remarks,
+                         workC, customer - workC, (customer - workC) * 100.0 / customer if customer else 0,
+                         workS, signific - workS, (signific - workS) * 100.0 / signific if signific else 0,
+                         workI, insignific - workI, (insignific - workI) * 100.0 / insignific if insignific else 0])
     else:
         return redirect("accounts/login/?next=/")
     if request.method == 'POST':
@@ -353,7 +405,7 @@ def infoGIP(request, id):
         return render(request, 'GIPlog.html')
 
 def homeGIP(request, id):
-    if request.user.groups.filter(name='ГИП').exists():
+    if request.user.is_superuser:
         reest = reestInfo.objects.get(id=id)
         reestrs = reestr.objects.filter(reestrID=id)
         deadline = workDays(reest.start_date, 2)
@@ -364,9 +416,21 @@ def homeGIP(request, id):
                 reest.step = request.POST.get("step")
                 reest.save(update_fields=['step'])
         return render(request, 'homeGIP.html', {'reestrs': reestrs, 'reest': reest, 'deadline': deadline, 'group': 'ГИП'})
+    elif request.user.groups.filter(name='ГИП').exists():
+        reest = reestInfo.objects.get(id=id)
+        reestrs = reestr.objects.filter((Q(reestrID=id) & Q(actuality=True)))
+        deadline = workDays(reest.start_date, 2)
+        if request.method == 'POST':
+            if request.POST.get('id'):
+                xlslxCreate(request)
+            else:
+                reest.step = request.POST.get("step")
+                reest.save(update_fields=['step'])
+        return render(request, 'homeGIP.html',
+                      {'reestrs': reestrs, 'reest': reest, 'deadline': deadline, 'group': 'ГИП'})
     elif request.user.groups.filter(name='Руководитель').exists():
         reest = reestInfo.objects.get(id=id)
-        reestrs = reestr.objects.filter((Q(reestrID=id) & Q(responsibleTrouble_name=request.user)))
+        reestrs = reestr.objects.filter((Q(reestrID=id) & Q(responsibleTrouble_name=request.user) & Q(actuality=True)))
         deadline = workDays(reest.start_date, 2)
         if request.method == 'POST':
             if request.POST.get('id'):
@@ -377,7 +441,7 @@ def homeGIP(request, id):
         return render(request, 'homeGIP.html', {'reestrs': reestrs, 'reest': reest, 'deadline': deadline, 'group': 'Руководитель'})
     elif request.user.groups.filter(name='Исполнитель').exists():
         reest = reestInfo.objects.get(id=id)
-        reestrs = reestr.objects.filter((Q(reestrID=id) & Q(executor_name=request.user)))
+        reestrs = reestr.objects.filter((Q(reestrID=id) & Q(executor_name=request.user) & Q(actuality=True)))
         deadline = workDays(reest.start_date, 2)
         if request.method == 'POST':
             if request.POST.get('id'):
@@ -392,6 +456,7 @@ def fileManage(request, id):
     if request.user.groups.filter(name='ГИП').exists() or request.user.is_superuser:
         if request.method == 'POST':
             delets = request.POST.get('deletelist')
+            print(delets)
             filelist = []
             k = 0
             while delets[0] not in '0123456789':
@@ -403,6 +468,7 @@ def fileManage(request, id):
                 elif i == len(delets)-1:
                     filelist.append(int(delets[k:]))
             for f in filelist:
+                print(f)
                 files.objects.get(id=f).delete()
             return render(request, 'fileManage.html', {'reest': reest, 'files': add_files, 'group': 'ГИП'})
         else:
@@ -718,22 +784,35 @@ def employee(request, id):
 def boss2(request, id):
     if request.user.groups.filter(name='Руководитель').exists():
         if request.method == 'POST':
-            form = GIPform2(reestr.objects.get(id=id), request.POST or None)
+            form = BossForm2(reestr.objects.get(id=id), request.POST or None)
             db_form = reestr.objects.get(id=id)
             if form.is_valid():
-                db_form.executor_fail_name = form.cleaned_data.get('executor_fail_name')
-                db_form.executor_name = form.cleaned_data.get('executor_name')
-                db_form.labor_costs_plan = form.cleaned_data.get('labor_costs_plan')
-                db_form.comment = form.cleaned_data.get('comment')
-                db_form.answer_remark = form.cleaned_data.get('answer_remark')
-                db_form.total_importance = form.cleaned_data.get('total_importance')
-                db_form.root_cause_list = form.cleaned_data.get('root_cause_list')
-                db_form.answer_date_plan = form.cleaned_data.get('answer_date_plan')
-                db_form.answer_deadline_correct_plan = form.cleaned_data.get('answer_deadline_correct_plan')
-                db_form.save(update_fields=['executor_fail_name', 'executor_name',
-                                                'answer_date_plan', 'answer_deadline_correct_plan', 'labor_costs_plan',
-                                                'comment', 'answer_remark', 'total_importance', 'root_cause_list'])
+                old_fields = [db_form.executor_fail_name, db_form.executor_name, db_form.labor_costs_plan,
+                              db_form.comment, db_form.answer_remark, db_form.total_importance,
+                              db_form.root_cause_list, db_form.answer_date_plan, db_form.answer_deadline_correct_plan]
+                new_fields = [form.cleaned_data.get('executor_fail_name'), form.cleaned_data.get('executor_name'),
+                              form.cleaned_data.get('labor_costs_plan'), form.cleaned_data.get('comment'),
+                              form.cleaned_data.get('answer_remark'), form.cleaned_data.get('total_importance'),
+                              form.cleaned_data.get('root_cause_list'), form.cleaned_data.get('answer_date_plan'),
+                              form.cleaned_data.get('answer_deadline_correct_plan')]
+                if old_fields != new_fields:
+                    new_remark = form.save(commit=False)
+                    new_remark.remark_v += 1
+                    db_form.actuality = False
+                    db_form.save(update_fields=['actuality'])
+                    new_remark.save()
+                    form = BossForm2(new_remark)
+                    return render(request, 'boss2.html', {'form': form,
+                                                      'gipcontext':
+                                                          reestr.objects.get(id=id).gip.last_name + ' ' +
+                                                          reestr.objects.get(id=id).gip.first_name,
+                                                      'rescontext':
+                                                          reestr.objects.get(
+                                                              id=id).responsibleTrouble_name.last_name + ' ' +
+                                                          reestr.objects.get(id=id).responsibleTrouble_name.first_name,
+                                                      })
             else:
+                print(form.errors.as_data())
                 return render(request, 'boss2.html', {'form': form,
                                                       'gipcontext':
                                                           reestr.objects.get(id=id).gip.last_name + ' ' +
@@ -744,7 +823,7 @@ def boss2(request, id):
                                                           reestr.objects.get(id=id).responsibleTrouble_name.first_name,
                                                       })
         else:
-            form = GIPform2(reestr.objects.get(id=id))
+            form = BossForm2(reestr.objects.get(id=id))
         return render(request, 'boss2.html', {'form': form,
                                               'gipcontext':
                                                   reestr.objects.get(id=id).gip.last_name + ' ' +
@@ -762,25 +841,31 @@ def gip2(request, id):
             form = GIPform2(reestr.objects.get(id=id), request.POST or None)
             db_form = reestr.objects.get(id=id)
             if form.is_valid():
-                db_form.remark_name = form.cleaned_data.get('remark_name')
-                db_form.rational = form.cleaned_data.get('rational')
-                db_form.designation_name = form.cleaned_data.get('designation_name')
-                db_form.section_name = form.cleaned_data.get('section_name')
-                db_form.responsibleTrouble_name = form.cleaned_data.get('responsibleTrouble_name')
-                db_form.executor_fail_name = form.cleaned_data.get('executor_fail_name')
-                db_form.executor_name = form.cleaned_data.get('executor_name')
-                db_form.labor_costs_plan = form.cleaned_data.get('labor_costs_plan')
-                db_form.comment = form.cleaned_data.get('comment')
-                db_form.answer_remark = form.cleaned_data.get('answer_remark')
-                db_form.total_importance = form.cleaned_data.get('total_importance')
-                db_form.root_cause_list = form.cleaned_data.get('root_cause_list')
-                db_form.answer_date_plan = form.cleaned_data.get('answer_date_plan')
-                db_form.answer_deadline_correct_plan = form.cleaned_data.get('answer_deadline_correct_plan')
-                db_form.save(update_fields=['remark_name', 'rational', 'designation_name', 'section_name',
-                                                'responsibleTrouble_name', 'executor_fail_name', 'executor_name',
-                                                'answer_date_plan', 'answer_deadline_correct_plan', 'labor_costs_plan',
-                                                'comment', 'answer_remark', 'total_importance', 'root_cause_list'])
+                old_fields = [db_form.remark_name, db_form.rational, db_form.designation_name, db_form.section_name,
+                              db_form.responsibleTrouble_name, db_form.executor_fail_name, db_form.executor_name,
+                              db_form.labor_costs_plan, db_form.comment, db_form.answer_remark, db_form.total_importance,
+                              db_form.root_cause_list, db_form.answer_date_plan, db_form.answer_deadline_correct_plan]
+                new_fields = [form.cleaned_data.get('remark_name'), form.cleaned_data.get('rational'),
+                              form.cleaned_data.get('designation_name'), form.cleaned_data.get('section_name'),
+                              form.cleaned_data.get('responsibleTrouble_name'), form.cleaned_data.get('executor_fail_name'),
+                              form.cleaned_data.get('executor_name'), form.cleaned_data.get('labor_costs_plan'),
+                              form.cleaned_data.get('comment'), form.cleaned_data.get('answer_remark'),
+                              form.cleaned_data.get('total_importance'), form.cleaned_data.get('root_cause_list'),
+                              form.cleaned_data.get('answer_date_plan'), form.cleaned_data.get('answer_deadline_correct_plan')]
+                if old_fields != new_fields:
+                    new_remark = form.save(commit=False)
+                    new_remark.remark_v += 1
+                    new_remark.save()
+                    db_form.actuality = False
+                    db_form.save(update_fields=['actuality'])
+                    form = GIPform2(new_remark)
+                    return render(request, 'GIP2.html', {'form': form,
+                                                          'gipcontext':
+                                                              reestr.objects.get(id=id).gip.last_name + ' ' +
+                                                              reestr.objects.get(id=id).gip.first_name,
+                                                          })
             else:
+                print(form.errors.as_data())
                 return render(request, 'GIP2.html', {'form': form,
                                                      'gipcontext':
                                                          reestr.objects.get(id=id).gip.last_name + ' ' +
@@ -856,6 +941,18 @@ def close(request, id):
                 else:
                     db_form.cancel_remark = cancel_remark
                     db_form.save(update_fields=['cancel_remark'])
+                    remarks = reestr.objects.filter(reestrID=db_form.reestrID)
+                    print(remarks)
+                    close = True
+                    for r in remarks:
+                        if r.cancel_remark is None:
+                            close = False
+                            break
+                    print(close)
+                    if close:
+                        reest = reestInfo.objects.get(id=db_form.reestrID.id)
+                        reest.step = 4
+                        reest.save(update_fields=['step'])
             else:
                 cancel_remark = form.cleaned_data.get('cancel_remark')
                 if cancel_remark is None:

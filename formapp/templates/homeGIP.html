@@ -72,7 +72,11 @@
             <td align="center" class="names">{{ r.responsibleTrouble_name }}</td>
             <td align="center" >{{ reest.start_date }}</td>
             <td align="center" >{{ deadline }}</td>
-            <td></td>
+            {% if r.cancel_remark %}
+            <td>Завершён</td>
+            {% else %}
+            <td>В работе</td>
+            {% endif %}
             {% if r.labor_costs_plan %}
                 <td align="center" >{{ r.labor_costs_plan }}</td>
             {% else %}

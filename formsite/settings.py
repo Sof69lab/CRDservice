@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     "formapp.apps.FormappConfig",
+    "changelog.apps.ChangelogConfig",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -48,6 +49,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "changelog.middleware.LoggedInUserMiddleware",
 ]
 
 ROOT_URLCONF = "formsite.urls"
@@ -82,8 +84,8 @@ DATABASES = {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
         "NAME": "form_db",
         "USER": "postgres",
-        "PASSWORD": "!QAZ2wsx#EDC",
-        "HOST": "10.200.19.240",
+        "PASSWORD": "63618ljv",
+        "HOST": "127.0.0.1",
         "PORT": "5432",
     }
 }
